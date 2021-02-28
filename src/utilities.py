@@ -3,7 +3,6 @@ from typing import List, Tuple, Iterable
 import numpy as np
 import torch
 import torch.nn as nn
-import torch.nn.functional as F
 from scipy.sparse.linalg import LinearOperator, eigsh
 from torch import Tensor
 from torch.nn.utils import parameters_to_vector, vector_to_parameters
@@ -112,8 +111,6 @@ def lanczos(matrix_vector, dim: int, neigs: int):
         gpu_vec = torch.tensor(vec, dtype=torch.float).cuda()
         return matrix_vector(gpu_vec)
 
-        # return matrix_vector(gpu_vec).cpu().numpy()
-
     operator = LinearOperator((dim, dim), matvec=mv)
     evals, evecs = eigsh(operator, neigs)
     return torch.from_numpy(np.ascontiguousarray(evals[::-1])).float(), \
@@ -143,6 +140,17 @@ def compute_gradient(network: nn.Module, loss_fn: nn.Module,
 
 
 class AtParams(object):
+    """ Within a with block, install a new set of parameters into a network.
+
+    Usage:
+
+        # suppose the network has parameter vector old_params
+        with AtParams(network, new_params):
+            # now network has parameter vector new_params
+            do_stuff()
+        # now the network once again has parameter vector new_params
+    """
+
     def __init__(self, network: nn.Module, new_params: Tensor):
         self.network = network
         self.new_params = new_params
@@ -160,12 +168,6 @@ def compute_gradient_at_theta(network: nn.Module, loss_fn: nn.Module, dataset: D
     """ Compute the gradient of the loss function at arbitrary network parameters "theta".  """
     with AtParams(network, theta):
         return compute_gradient(network, loss_fn, dataset, physical_batch_size=batch_size)
-
-    # stash = parameters_to_vector(network.parameters())
-    # vector_to_parameters(theta, network.parameters())
-    # gradient = compute_gradient(network, loss_fn, dataset, physical_batch_size=batch_size)
-    # vector_to_parameters(stash, network.parameters())
-    # return gradient
 
 
 class SquaredLoss(nn.Module):

@@ -43,9 +43,9 @@ ${RESULTS}/cifar10-5k/fc-tanh/seed_0/mse/gd/lr_0.01
 Within this output directory, the following files will be created, each containing a PyTorch tensor:
  - `train_loss_final`, `test_loss_final`, `train_acc_final`, `test_acc_final`: the train and test
  losses and accuracies, recorded at each iteration
- - `eigs_final`: the top 2 eigenvalues, measured every 100 (`eig_freq`) iterations.
+ - `eigs_final`: the top 2 eigenvalues, measured every 50 (`eig_freq`) iterations.
 
-We can plot the train loss, train accuracy, and sharpness, using the following matplotlib code:
+The following matplotlib code will plot the train loss, train accuracy, and sharpness.
 ```python
 import torch
 import matplotlib.pyplot as plt
@@ -65,7 +65,7 @@ gd_train_loss = torch.load(f"{gd_directory}/train_loss_final")
 gd_train_acc = torch.load(f"{gd_directory}/train_acc_final")
 gd_sharpness = torch.load(f"{gd_directory}/eigs_final")[:,0]
 
-plt.figure(figsize=(5, 5), dpi=200)
+plt.figure(figsize=(5, 5), dpi=100)
 
 plt.subplot(3, 1, 1)
 plt.plot(gd_train_loss)
@@ -89,16 +89,13 @@ plt.xlabel("iteration")
 The following command will train the same network using gradient flow --- that is, by using the Runge-Kutta
  algorithm to numerically integrate the gradient flow ODE.
 ```
-python src/flow.py --dataset cifar10-5k --arch_id fc-tanh --loss mse  --tick 1.0  --max_time 1000 --acc_goal 0.99 --neigs 2  --eig_freq 1 --nproj 500 --iterate_freq 1
+python src/flow.py --dataset cifar10-5k --arch_id fc-tanh --loss mse  --tick 1.0  --max_time 1000 --acc_goal 0.99 --neigs 2  --eig_freq 1
 ```
 Here, the flag ``--tick 1.0`` means that the train/test losses and accuracies will be computed and saved after each 1.0 units of time, 
 and the flag `--max_time 1000` means that training will stop after a maximum of 1000 units of time (or until the train accuracy reaches the `acc_goal` of 0.99).
 The other flags mean the same thing as in the `gd.py` example above.
 
 See the detailed `flow.py` documentation below for details on how the Runge Kutta step size is set.
-
-The flags ``--nproj 500 --iterate_freq 1`` means that a 500-dimensional random projection of the iterates 
-will be saved every 1 tick, which in turn amounts here to every 1 unit of time.
 
 The following matplotlib code will plot the train loss, train accuracy, and sharpness:
 
@@ -112,7 +109,7 @@ flow_train_loss = torch.load(f"{flow_directory}/train_loss_final")
 flow_train_acc = torch.load(f"{flow_directory}/train_acc_final")
 flow_sharpness = torch.load(f"{flow_directory}/eigs_final")[:, 0]
 
-plt.figure(figsize=(5, 5), dpi=200)
+plt.figure(figsize=(5, 5), dpi=100)
 
 plt.subplot(3, 1, 1)
 plt.plot(torch.arange(len(flow_train_loss)) * flow_tick, flow_train_loss)
@@ -148,10 +145,14 @@ A PyTorch tensor containing the random projections of the iterates will be store
 Similarly, by adding the flags `--nproj 500 --iterate_freq 1` to the `src/flow.py` command, we can
 instruct `flow.py` to save a 500-dimensional random projection of the iterates every 1 tick (which, in turn, means every 1 unit of time, since `tick`= 1 ).
  
+Thus, for both gradient descent and gradient flow, we're saving (random projections of) the iterates every 1.0 units of time.
+Therefore, we can directly compare these saved iterates in order to assess whether gradient descent follows the same
+trajectory as gradient flow.
+ 
  The following matplotlib code plots the distance between the gradient descent trajectory and the gradient flow trajectory: 
 
 ```python
-gd_iterate_freq = 100
+gd_iterate_freq = 50
 flow_iterate_freq = 1
 
 # the GD iterates are saved every "gd_lr * gd_iterate_freq" units of time.
@@ -169,7 +170,7 @@ distance = (gd_iterates[:length, :] - flow_iterates[:length, :]).norm(dim=1)
 # the time at which the gradient descent sharpness first crosses the threshold (2  / gd_lr)
 cross_threshold_time = (gd_sharpness > (2 / gd_lr)).nonzero()[0][0] * gd_lr * gd_iterate_freq
 
-plt.figure(figsize=(5, 2), dpi=200)
+plt.figure(figsize=(5, 2), dpi=100)
 plt.scatter(times, distance)
 plt.axvline(cross_threshold_time, linestyle='dotted')
 plt.ylim((0, plt.ylim()[1]))
