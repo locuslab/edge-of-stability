@@ -20,8 +20,8 @@ To run the code, you need to set two environment variables:
 
 ### Quick start
 
-Let's walk through how to use `gd.py` and `flow.py`
-.
+Let's walk through how to use `gd.py` and `flow.py`.
+
 #### Gradient descent
 
 The script `gd.py` trains a neural network using gradient descent.
@@ -81,7 +81,6 @@ plt.axhline(2. / gd_lr, linestyle='dotted')
 plt.title("sharpness")
 plt.xlabel("iteration")
 ```
-
 
 ![demo](figures/demo1.png)
 
