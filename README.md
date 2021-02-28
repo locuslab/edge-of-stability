@@ -224,13 +224,13 @@ The required parameters of `src/gd.py` are:
 
 The optional parameters of `src/gd.py` are:
  - `seed` [int]: the random seed used when initializing the network weights.
- - `opt` [string]: which (full-batch) gradient descent variant to use.  The options are:
+ - `opt` [string, defaults to 'gd']: which (full-batch) gradient descent variant to use.  The options are:
     - `gd`: vanilla gradient descent.
     - `polyak`: Polyak-style momentum.
      If you use this option, make sure to pass in a value for `beta` (the momentum parameter). 
     - `nesterov`: Nesterov-style momentum.
     If you use this option, make sure to pass in a value for `beta` (the momentum parameter).
- - `beta` [float]: if you use Polyak or Nesterov momentum (i.e. if `gd` = `polyak` or `nesterov`), this is the value of the momentum
+ - `beta` [float, defaults to 0.0]: if you use Polyak or Nesterov momentum (i.e. if `gd` = `polyak` or `nesterov`), this is the value of the momentum
  parameter.  This parameter is ignored if you run vanilla gradient descent.
  - `physical_batch_size` [int, defaults to 1000]: the maximum number of examples that we try to fit on the GPU at once.
  For large networks, you may have to reduce this from the default of 1000.
@@ -295,6 +295,7 @@ The optional parameters of `src/flow.py` are:
  - `eig_freq` [int, defaults to -1]: see above
  - `nproj`: [int, defaults to 0]: see above
 - `iterate_freq` [int, defaults to -1]: see above
+- `save_freq` [int, defaults to -1]: see above
 - `abridged_size` [int, defaults to 5000]: see above
 - `save_model` [bool, defaults to False]: see above
 
