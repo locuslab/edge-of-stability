@@ -160,7 +160,7 @@ def load_architecture(arch_id: str, dataset_name: str) -> nn.Module:
         return vgg11_nodropout_bn()
 
     # ====== additional networks ========
-    elif arch_id == 'transformer':
+    # elif arch_id == 'transformer':
         # return TransformerModelFixed()
     elif arch_id == 'deeplinear':
         return make_deeplinear(20, 50)

@@ -1,10 +1,11 @@
 from os import makedirs
 
+from data import DATASETS
 import torch
 import torch.nn as nn
-from fire import Fire
 from torch.nn.utils import parameters_to_vector, vector_to_parameters
 from torch.utils.data import Dataset
+import argparse
 
 from archs import load_architecture
 from utilities import get_flow_directory, get_loss_and_acc, compute_losses, \
@@ -42,10 +43,11 @@ def rk_advance_time(network: nn.Module, loss_fn: nn.Module, dataset: Dataset, T:
         T_remaining -= rk_step_size
 
 
-def main(dataset, arch_id, loss, max_time, tick, neigs=0, physical_batch_size=1000, abridged_size=5000,
-         eig_freq=-1, iterate_freq=-1, save_freq=-1, alpha=1.0, nproj=0, loss_goal=None,
-         acc_goal=None, max_step_size=999, seed=0):
+def main(dataset: str, arch_id: str, loss: str, max_time: float, tick: float, neigs=0, physical_batch_size=1000,
+         abridged_size: int = 5000, eig_freq: int = -1, iterate_freq: int = -1, save_freq: int = -1, alpha: float = 1.0,
+         nproj: int = 0, loss_goal: float = None, acc_goal: float = None, max_step_size: int = 999, seed: int = 0):
     directory = get_flow_directory(dataset, arch_id, seed, loss, tick)
+    print(f"output directory: {directory}")
     makedirs(directory, exist_ok=True)
 
     train_dataset, test_dataset = load_dataset(dataset, loss)
@@ -111,4 +113,38 @@ def main(dataset, arch_id, loss, max_time, tick, neigs=0, physical_batch_size=10
 
 
 if __name__ == "__main__":
-    Fire(main)
+    parser = argparse.ArgumentParser(description="Train using gradient flow.")
+    parser.add_argument("dataset", type=str, choices=DATASETS, help="which dataset to train")
+    parser.add_argument("arch_id", type=str, help="which network architectures to train")
+    parser.add_argument("loss", type=str, choices=["ce", "mse"], help="which loss function to use")
+    parser.add_argument("max_time", type=float, help="the maximum time (ODE time, not wall clock time) to train for")
+    parser.add_argument("tick", type=float,
+                        help="the train / test losses and accuracies will be computed and saved every tick units of time")
+    parser.add_argument("--alpha", type=float, default=1.0,
+                        help=" the Runge-Kutta step size is min(alpha / [estimated sharpness], max_step_size).")
+    parser.add_argument("--max_step_size", type=float, default=999,
+                        help=" the Runge-Kutta step size is min(alpha / [estimated sharpness], max_step_size)")
+    parser.add_argument("--seed", type=int, help="the random seed used when initializing the network weights",
+                        default=0)
+    parser.add_argument("--beta", type=float, help="momentum parameter (used if opt = polyak or nesterov)")
+    parser.add_argument("--physical_batch_size", type=int,
+                        help="the maximum number of examples that we try to fit on the GPU at once", default=1000)
+    parser.add_argument("--acc_goal", type=float,
+                        help="terminate training if the train accuracy ever crosses this value")
+    parser.add_argument("--loss_goal", type=float, help="terminate training if the train loss ever crosses this value")
+    parser.add_argument("--neigs", type=int, help="the number of top eigenvalues to compute")
+    parser.add_argument("--eig_freq", type=int, default=-1,
+                        help="the frequency at which we compute the top Hessian eigenvalues (-1 means never)")
+    parser.add_argument("--nproj", type=int, default=0, help="the dimension of random projections")
+    parser.add_argument("--iterate_freq", type=int, default=-1,
+                        help="the frequency at which we save random projections of the iterates")
+    parser.add_argument("--abridged_size", type=int, default=5000,
+                        help="when computing top Hessian eigenvalues, use an abridged dataset of this size")
+    parser.add_argument("--save_model", type=bool, default=False,
+                        help="if 'true', save model weights at end of training")
+    args = parser.parse_args()
+
+    main(dataset=args.dataset, arch_id=args.arch_id, loss=args.loss, max_time=args.max_time, tick=args.tick,
+         neigs=args.neigs, physical_batch_size=args.physical_batch_size, abridged_size=args.abridged_size,
+         eig_freq=args.eig_freq, iterate_freq=args.iterate_freq, save_freq=args.save_freq, nproj=args.nproj,
+         loss_goal=args.loss_goal, acc_goal=args.acc_goal, seed=args.seed)

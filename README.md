@@ -5,9 +5,12 @@ at the Edge of Stability](https://openreview.net/forum?id=jh-rTtvkGeM) by Jeremy
 
 ![](https://www.cs.cmu.edu/~jeremiac/gd.gif)
 
-### Quick start
+The structure of this README is:
+1. [Preliminaries](#anchors-in-markdown)
+2. [Quick start](#quick-start)
+3. [Complete documentation](#complete-documentation)
 
-#### Preliminaries
+### Preliminaries
 
 To run the code, you need to set two environment variables:
 1. Set the `DATASETS` environment variable to a directory where datasets will be stored.
@@ -15,30 +18,32 @@ To run the code, you need to set two environment variables:
 2. Set the `RESULTS` environment variable to a directory where results will be stored.
  For example: `export RESULTS="/my/directory/results"`.
 
+### Quick start
 
+Let's walk through how to use `gd.py` and `flow.py`
+.
 #### Gradient descent
 
-Train a network using gradient descent:
+The script `gd.py` trains a neural network using gradient descent.
+For example:
 ```
 python src/gd.py --dataset cifar10-5k --arch_id fc-tanh --loss mse --opt gd --lr 0.01  --max_steps 100000 --acc_goal 0.99 --neigs 2  --eig_freq 100
 ```
-This command will train a fully-connected tanh network (`fc-tanh`) on a 5k subset of CIFAR-10 (`cifar10-5k`),
-by using gradient descent with step size 0.01 (`lr`) to optimize the square loss (`mse`). 
+The above command will train a fully-connected tanh network (`fc-tanh`) on a 5k subset of CIFAR-10 (`cifar10-5k`) using the square loss (`mse`).
+We will run vanila gradient descent (`gd`) with step size 0.01 (`lr`).
 Training will terminate when either the train accuracy reaches 99% (`train_acc`) or when 100,000 (`max_steps`)
 iterations have passed.
-
-The step size will be , until either a maximum of 100,000 iterations, or until the training accuracy reaches 99%.
-Every 50 iterations, we will compute and record the top 2 eigenvalues of the training loss Hessian.
-The training results will be saved in this output directory:
+Every 50 (`eig_freq`) iterations, the top 2 (`neigs`) eigenvalues of the training loss Hessian will be computed and recorded.
+The training results will be saved in the following output directory:
 ```
 ${RESULTS}/cifar10-5k/fc-tanh/seed_0/mse/gd/lr_0.01
 ```
 (See `get_gd_directory()` in `utilities.py` for the formula by which this output directory is named.)
 
-Within this directory, the following files will be created, each containing a PyTorch tensor:
+Within this output directory, the following files will be created, each containing a PyTorch tensor:
  - `train_loss_final`, `test_loss_final`, `train_acc_final`, `test_acc_final`: the train and test
- losses and accuracies, recorded every step.
- - `eigs_final`: the top 2 eigenvalues, measured every 100 iterations.
+ losses and accuracies, recorded at each iteration
+ - `eigs_final`: the top 2 eigenvalues, measured every 100 (`eig_freq`) iterations.
 
 We can plot the train loss, train accuracy, and sharpness, using the following matplotlib code:
 ```python

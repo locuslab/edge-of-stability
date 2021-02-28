@@ -5,6 +5,10 @@ from torch.utils.data import TensorDataset
 from cifar import load_cifar
 # from wikitext import load_wikitext_2
 
+DATASETS = [
+    "cifar10", "cifar10-1k", "cifar10-2k", "cifar10-5k", "cifar10-10k", "cifar10-20k"
+]
+
 def flatten(arr: np.ndarray):
     return arr.reshape(arr.shape[0], -1)
 
