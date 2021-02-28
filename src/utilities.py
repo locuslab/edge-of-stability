@@ -85,8 +85,6 @@ def get_loss_and_acc(loss: str):
         return SquaredLoss(), SquaredAccuracy()
     elif loss == "ce":
         return nn.CrossEntropyLoss(reduction='sum'), AccuracyCE()
-    elif loss == "nll":
-        return NLP_NLL_Loss(), VoidLoss()
     raise NotImplementedError(f"no such loss function: {loss}")
 
 
@@ -195,17 +193,3 @@ class VoidLoss(nn.Module):
     def forward(self, X, Y):
         return 0
 
-
-class NLP_NLL_Loss(nn.Module):
-    def __init__(self, ntokens=33278):  # I'm hard-coding the number of tokens in the wikitext dataset
-        super(NLP_NLL_Loss, self).__init__()
-        self.ntokens = ntokens
-
-    # TODO redo this so that i just use the ntokens that comes in, rather than saving it
-    def forward(self, X, Y):
-        """ The tensor X has dimensions [bptt x batch_size x ntokens].  This tensor comes from "batch_size" unrelated
-        chunks of text, each of length "bptt".  The third dimension (of size "ntokens") has softmax probabilities.
-        Note that it's a little unusual that "batch_size" is the second dimension rather than the first; I just took
-        that from the tutorial. """
-        bptt, batch_size = X.shape[0], X.shape[1]
-        return F.nll_loss(X.view(-1, self.ntokens), Y.view(-1), reduction='sum') / batch_size

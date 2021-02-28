@@ -3,7 +3,7 @@ import numpy as np
 from typing import Tuple
 from torch.utils.data import TensorDataset
 from cifar import load_cifar
-from wikitext import load_wikitext_2
+# from wikitext import load_wikitext_2
 
 def flatten(arr: np.ndarray):
     return arr.reshape(arr.shape[0], -1)
@@ -61,7 +61,5 @@ def load_dataset(dataset_name: str, loss: str) -> (TensorDataset, TensorDataset)
     elif dataset_name == "cifar10-20k":
         train, test = load_cifar(loss)
         return take_first(train, 20000), test
-    elif dataset_name == "wikitext":
-        return load_wikitext_2('raw-100')
 
 

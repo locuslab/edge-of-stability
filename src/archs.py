@@ -3,7 +3,6 @@ from typing import List
 import torch
 import torch.nn as nn
 
-from nlp_archs import TransformerModelFixed
 from resnet_cifar import resnet32
 from vgg import vgg11_nodropout, vgg11_nodropout_bn
 from data import num_classes, num_input_channels, image_size, num_pixels
@@ -162,7 +161,7 @@ def load_architecture(arch_id: str, dataset_name: str) -> nn.Module:
 
     # ====== additional networks ========
     elif arch_id == 'transformer':
-        return TransformerModelFixed() # TODO look into this
+        # return TransformerModelFixed()
     elif arch_id == 'deeplinear':
         return make_deeplinear(20, 50)
     elif arch_id == 'regression':
