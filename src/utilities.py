@@ -113,8 +113,8 @@ def lanczos(matrix_vector, dim: int, neigs: int):
 
     operator = LinearOperator((dim, dim), matvec=mv)
     evals, evecs = eigsh(operator, neigs)
-    return torch.from_numpy(np.ascontiguousarray(evals[::-1])).float(), \
-           torch.from_numpy(np.ascontiguousarray(np.flip(evecs, -1))).float()
+    return torch.from_numpy(np.ascontiguousarray(evals[::-1]).copy()).float(), \
+           torch.from_numpy(np.ascontiguousarray(np.flip(evecs, -1)).copy()).float()
 
 
 def get_hessian_eigenvalues(network: nn.Module, loss_fn: nn.Module, dataset: Dataset,

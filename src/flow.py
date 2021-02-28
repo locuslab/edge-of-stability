@@ -117,9 +117,9 @@ if __name__ == "__main__":
     parser.add_argument("dataset", type=str, choices=DATASETS, help="which dataset to train")
     parser.add_argument("arch_id", type=str, help="which network architectures to train")
     parser.add_argument("loss", type=str, choices=["ce", "mse"], help="which loss function to use")
-    parser.add_argument("max_time", type=float, help="the maximum time (ODE time, not wall clock time) to train for")
     parser.add_argument("tick", type=float,
                         help="the train / test losses and accuracies will be computed and saved every tick units of time")
+    parser.add_argument("max_time", type=float, help="the maximum time (ODE time, not wall clock time) to train for")
     parser.add_argument("--alpha", type=float, default=1.0,
                         help=" the Runge-Kutta step size is min(alpha / [estimated sharpness], max_step_size).")
     parser.add_argument("--max_step_size", type=float, default=999,

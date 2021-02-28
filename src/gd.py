@@ -45,6 +45,7 @@ def main(dataset: str, arch_id: str, loss: str, opt: str, lr: float, max_steps: 
         if eig_freq != -1 and step % eig_freq == 0:
             eigs[step // eig_freq, :] = get_hessian_eigenvalues(network, loss_fn, abridged_train, neigs=neigs,
                                                                 physical_batch_size=physical_batch_size)
+            print("eigenvalues: ", eigs[step//eig_freq, :])
 
         if iterate_freq != -1 and step % iterate_freq == 0:
             iterates[step // iterate_freq, :] = projectors.mv(parameters_to_vector(network.parameters()).cpu().detach())
@@ -78,10 +79,10 @@ if __name__ == "__main__":
     parser.add_argument("dataset", type=str, choices=DATASETS, help="which dataset to train")
     parser.add_argument("arch_id", type=str, help="which network architectures to train")
     parser.add_argument("loss", type=str, choices=["ce", "mse"], help="which loss function to use")
-    parser.add_argument("opt", type=str, choices=["gd", "polyak", "nesterov"],
-                        help="which optimization algorithm to use")
     parser.add_argument("lr", type=float, help="the learning rate")
     parser.add_argument("max_steps", type=int, help="the maximum number of gradient steps to train for")
+    parser.add_argument("--opt", type=str, choices=["gd", "polyak", "nesterov"],
+                        help="which optimization algorithm to use", default="gd")
     parser.add_argument("--seed", type=int, help="the random seed used when initializing the network weights",
                         default=0)
     parser.add_argument("--beta", type=float, help="momentum parameter (used if opt = polyak or nesterov)")
@@ -98,6 +99,8 @@ if __name__ == "__main__":
                         help="the frequency at which we save random projections of the iterates")
     parser.add_argument("--abridged_size", type=int, default=5000,
                         help="when computing top Hessian eigenvalues, use an abridged dataset of this size")
+    parser.add_argument("--save_freq", type=int, default=-1,
+                        help="the frequency at which we save resuls")
     parser.add_argument("--save_model", type=bool, default=False,
                         help="if 'true', save model weights at end of training")
     args = parser.parse_args()

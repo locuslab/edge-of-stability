@@ -25,12 +25,18 @@ Let's walk through how to use `gd.py` and `flow.py`.
 #### Gradient descent
 
 The script `gd.py` trains a neural network using gradient descent.
+The required arguments are:
+
+```
+gd.py [dataset] [arch_id] [loss] [lr] [max_steps]
+```
+
 For example:
 ```
-python src/gd.py --dataset cifar10-5k --arch_id fc-tanh --loss mse --opt gd --lr 0.01  --max_steps 100000 --acc_goal 0.99 --neigs 2  --eig_freq 100
+python src/gd.py cifar10-5k fc-tanh  mse  0.01 100000 --acc_goal 0.99 --neigs 2  --eig_freq 100
 ```
 The above command will train a fully-connected tanh network (`fc-tanh`) on a 5k subset of CIFAR-10 (`cifar10-5k`) using the square loss (`mse`).
-We will run vanila gradient descent (`gd`) with step size 0.01 (`lr`).
+We will run vanila gradient descent with step size 0.01 (`lr`).
 Training will terminate when either the train accuracy reaches 99% (`train_acc`) or when 100,000 (`max_steps`)
 iterations have passed.
 Every 50 (`eig_freq`) iterations, the top 2 (`neigs`) eigenvalues of the training loss Hessian will be computed and recorded.
@@ -88,11 +94,17 @@ plt.xlabel("iteration")
 
 The following command will train the same network using gradient flow --- that is, by using the Runge-Kutta
  algorithm to numerically integrate the gradient flow ODE.
+ 
+ The required arguments are:
+ ```
+flow.py [dataset] [arch_id] [loss] [tick] [max_time]
 ```
-python src/flow.py --dataset cifar10-5k --arch_id fc-tanh --loss mse  --tick 1.0  --max_time 1000 --acc_goal 0.99 --neigs 2  --eig_freq 1
+For example:
 ```
-Here, the flag ``--tick 1.0`` means that the train/test losses and accuracies will be computed and saved after each 1.0 units of time, 
-and the flag `--max_time 1000` means that training will stop after a maximum of 1000 units of time (or until the train accuracy reaches the `acc_goal` of 0.99).
+python src/flow.py cifar10-5k fc-tanh mse 1.0  1000 --acc_goal 0.99 --neigs 2  --eig_freq 1
+```
+Here, the argument ``tick = 1.0`` means that the train/test losses and accuracies will be computed and saved after each 1.0 units of time, 
+and the argument `max_time  = 1000` means that training will stop after a maximum of 1000 units of time (or until the train accuracy reaches the `acc_goal` of 0.99).
 The other flags mean the same thing as in the `gd.py` example above.
 
 See the detailed `flow.py` documentation below for details on how the Runge Kutta step size is set.
@@ -207,17 +219,17 @@ The required parameters of `src/gd.py` are:
      as 0.5 times the squared L2 norm between the network outputs and the target vector.
      For classification tasks, we construct the target vector by assigning a 1 at the location of
      the true class, and assigning 0's everywhere else.
-- `opt` [string]: which (full-batch) gradient descent variant to use.  The options are:
+ - `lr` [float]: the learning rate
+ - `max_steps` [int]: the maximum number of gradient descent steps to train for.
+
+The optional parameters of `src/gd.py` are:
+ - `seed` [int]: the random seed used when initializing the network weights.
+ - `opt` [string]: which (full-batch) gradient descent variant to use.  The options are:
     - `gd`: vanilla gradient descent.
     - `polyak`: Polyak-style momentum.
      If you use this option, make sure to pass in a value for `beta` (the momentum parameter). 
     - `nesterov`: Nesterov-style momentum.
     If you use this option, make sure to pass in a value for `beta` (the momentum parameter).
- - `lr` [float]: the learning rate
- - `max_steps`: the maximum number of gradient descent steps to train for.
-
-The optional parameters of `src/gd.py` are:
- - `seed` [int]: the random seed used when initializing the network weights.
  - `beta` [float]: if you use Polyak or Nesterov momentum (i.e. if `gd` = `polyak` or `nesterov`), this is the value of the momentum
  parameter.  This parameter is ignored if you run vanilla gradient descent.
  - `physical_batch_size` [int, defaults to 1000]: the maximum number of examples that we try to fit on the GPU at once.
@@ -234,6 +246,9 @@ If `eig_freq` is set to `-1` (the default value), we never compute the top Hessi
 - `iterate_freq` [int, defaults to -1]: the frequency at which we save random projections of the iterates.
 For example, if `iterate_freq` is 10, we save random projections of the iterates every 10 GD iterations.
 If `iterate_freq` is set to -1 (the default value), we never save random projections of the iterates.
+- `save_freq` [int, defaults to -1]: the frequency at which we save the results of training (the train/test losses and 
+accuracies, and the computed eigenvalues).  If `save_freq` is set to -1 (the default value), then we only save these
+at the very end of training.
 - `abridged_size` [int, defaults to 5000]: when computing the top Hessian eigenvalues, use an "abridged" dataset of this
 size (obtained by choosing the first `abridged_size` examples in the training dataset.).
 - `save_model` [bool, defaults to False]: if `true`, save the model weights at the end of training.
