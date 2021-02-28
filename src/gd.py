@@ -10,7 +10,7 @@ from utilities import get_gd_optimizer, get_gd_directory, get_loss_and_acc, comp
 from data import load_dataset, take_first
 
 
-def main(dataset, arch_id, loss, opt, lr, max_steps, neigs, physical_batch_size=1000,
+def main(dataset, arch_id, loss, opt, lr, max_steps, neigs=0, physical_batch_size=1000,
          eig_freq=-1, iterate_freq=-1, save_freq=-1, save_model=False, beta=0, nproj=0,
          loss_goal=None, acc_goal=None, abridged_size=5000, seed=0):
     directory = get_gd_directory(dataset, lr, arch_id, seed, opt, loss, beta)
@@ -57,8 +57,8 @@ def main(dataset, arch_id, loss, opt, lr, max_steps, neigs, physical_batch_size=
             break
 
         optimizer.zero_grad()
-        for (X, y) in iterate_dataset(dataset, physical_batch_size):
-            loss = loss_fn(network(X.cuda()), y.cuda()) / len(dataset)
+        for (X, y) in iterate_dataset(train_dataset, physical_batch_size):
+            loss = loss_fn(network(X.cuda()), y.cuda()) / len(train_dataset)
             loss.backward()
         optimizer.step()
 
