@@ -55,8 +55,7 @@ The following matplotlib code will plot the train loss, train accuracy, and shar
 ```python
 import torch
 import matplotlib.pyplot as plt
-
-RESULTS = ... # results directory 
+from os import environ
 
 dataset = "cifar10-5k"
 arch = "fc-tanh"
@@ -64,8 +63,7 @@ loss = "mse"
 gd_lr = 0.01
 gd_eig_freq = 50
 
-
-gd_directory = f"{RESULTS}/{dataset}/{arch}/seed_0/{loss}/gd/lr_{gd_lr}"
+gd_directory = f"{environ['RESULTS']}/{dataset}/{arch}/seed_0/{loss}/gd/lr_{gd_lr}"
 
 gd_train_loss = torch.load(f"{gd_directory}/train_loss_final")
 gd_train_acc = torch.load(f"{gd_directory}/train_acc_final")
@@ -92,7 +90,7 @@ plt.xlabel("iteration")
 
 #### Gradient flow
 
-The following command will train the same network using gradient flow --- that is, by using the Runge-Kutta
+The script `flow.py` trains a neural network using gradient flow --- that is, by using the Runge-Kutta
  algorithm to numerically integrate the gradient flow ODE.
  
  The required arguments are:
@@ -115,7 +113,7 @@ The following matplotlib code will plot the train loss, train accuracy, and shar
 flow_tick = 1.0
 flow_eig_freq = 1
 
-flow_directory = f"{RESULTS}/{dataset}/{arch}/seed_0/{loss}/flow/tick_{flow_tick}"
+flow_directory = f"{environ['RESULTS']}/{dataset}/{arch}/seed_0/{loss}/flow/tick_{flow_tick}"
 
 flow_train_loss = torch.load(f"{flow_directory}/train_loss_final")
 flow_train_acc = torch.load(f"{flow_directory}/train_acc_final")
