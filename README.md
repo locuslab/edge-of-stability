@@ -1,5 +1,10 @@
 ## Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability
 
+This repository contains source code for the ICLR 2021 paper [Gradient Descent on Neural Networks Typically Occurs
+at the Edge of Stability](https://openreview.net/forum?id=jh-rTtvkGeM) by Jeremy Cohen, Simran Kaur, Yuanzhi Li, Zico Kolter, and Ameet Talwalkar.
+
+![](https://www.cs.cmu.edu/~jeremiac/gd.gif)
+
 ### Quick start
 
 #### Preliminaries
