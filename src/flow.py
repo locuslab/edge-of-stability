@@ -140,6 +140,8 @@ if __name__ == "__main__":
                         help="the frequency at which we save random projections of the iterates")
     parser.add_argument("--abridged_size", type=int, default=5000,
                         help="when computing top Hessian eigenvalues, use an abridged dataset of this size")
+    parser.add_argument("--save_freq", type=int, default=-1,
+                        help="the frequency at which we save resuls")
     parser.add_argument("--save_model", type=bool, default=False,
                         help="if 'true', save model weights at end of training")
     args = parser.parse_args()

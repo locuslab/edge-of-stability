@@ -113,7 +113,7 @@ The following matplotlib code will plot the train loss, train accuracy, and shar
 flow_tick = 1.0
 flow_eig_freq = 1
 
-flow_directory = f"{environ['RESULTS']}/{dataset}/{arch}/seed_0/{loss}/flow/tick_{flow_tick}"
+flow_directory = f"{environ['RESULTS'] }/{dataset}/{arch}/seed_0/{loss}/flow/tick_{flow_tick}"
 
 flow_train_loss = torch.load(f"{flow_directory}/train_loss_final")
 flow_train_acc = torch.load(f"{flow_directory}/train_acc_final")
