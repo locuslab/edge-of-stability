@@ -103,14 +103,14 @@ def make_deeplinear(L: int, d: int, seed=8):
     network = nn.Sequential(*layers)
     return network.cuda()
 
-def make_one_layer_network(h=10, seed=0, activation='tanh'):
+def make_one_layer_network(h=10, seed=0, activation='tanh', sigma_w=1.9):
     torch.manual_seed(seed)
     network = nn.Sequential(
         nn.Linear(1, h, bias=True),
         get_activation(activation),
         nn.Linear(h, 1, bias=False),
     )
-    nn.init.xavier_normal_(network[0].weight)
+    nn.init.xavier_normal_(network[0].weight, gain=sigma_w)
     nn.init.zeros_(network[0].bias)
     nn.init.xavier_normal_(network[2].weight)
     return network

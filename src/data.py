@@ -3,10 +3,12 @@ import numpy as np
 from typing import Tuple
 from torch.utils.data import TensorDataset
 from cifar import load_cifar
+from synthetic import make_chebyshev_dataset, make_linear_dataset
 # from wikitext import load_wikitext_2
 
 DATASETS = [
-    "cifar10", "cifar10-1k", "cifar10-2k", "cifar10-5k", "cifar10-10k", "cifar10-20k"
+    "cifar10", "cifar10-1k", "cifar10-2k", "cifar10-5k", "cifar10-10k", "cifar10-20k", "chebyshev-3-20",
+    "chebyshev-4-20", "chebyshev-5-20", "linear-50-50"
 ]
 
 def flatten(arr: np.ndarray):
@@ -65,5 +67,12 @@ def load_dataset(dataset_name: str, loss: str) -> (TensorDataset, TensorDataset)
     elif dataset_name == "cifar10-20k":
         train, test = load_cifar(loss)
         return take_first(train, 20000), test
-
+    elif dataset_name == "chebyshev-5-20":
+        return make_chebyshev_dataset(k=5, n=20)
+    elif dataset_name == "chebyshev-4-20":
+        return make_chebyshev_dataset(k=4, n=20)
+    elif dataset_name == "chebyshev-3-20":
+        return make_chebyshev_dataset(k=3, n=20)
+    elif dataset_name == 'linear-50-50':
+        return make_linear_dataset(n=50, d=50)
 
