@@ -207,6 +207,9 @@ The required parameters of `src/gd.py` are:
 - `dataset` [string]: the dataset to train on. The possible values are:
     - `cifar10`: the full CIFAR-10 dataset
     - `cifar10-5k`: the first 5,000 examples from the full CIFAR-10 dataset.  Along similar lines, you can also enter `cifar10-1k`, `cifar10-2k`, `cifar10-10k`, and `cifar10-20k`.
+    - `chebyshev-3-20`: a toy regression dataset comprising 20 points evenly spaced between -1 and 1 labeled noiselessly
+    by the Chebyshev polynomial of degree 3.  `chebyshev-4-20` and `chebyshev-5-20` are similar, but with
+    polynomials of degree 4 and 5. 
     - we will soon add the other datasets from the paper (wikitext, the synthetic datasets) to this repo  
 - `arch_id` [string]: which network architectures to train.  See `load_architecture()` in `archs.py` for a full list of the permissible values.
 - `loss` [string]: which loss function to use.  The possible values are:
